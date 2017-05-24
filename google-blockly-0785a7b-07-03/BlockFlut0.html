@@ -1,0 +1,140 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>BlockFlut0</title>
+<script src="blockly_uncompressed.js"></script>
+<script src="blocks/logic.js"></script>
+<script src="blocks/variables.js"></script>
+<script src="blocks/math.js"></script>
+<script src="blocks/custom.js"></script>
+
+
+<script src="generators/python.js"></script>
+<script src="generators/python/logic.js"></script>
+<script src="generators/python/variables.js"></script>
+<script src="generators/python/math.js"></script>
+<script src="generators/python/custom.js"></script>
+
+<script src="../jquery-3.2.1.min.js"></script>
+
+
+
+<script src="msg/js/fr.js"></script>
+</head>
+<body>
+<!--<button onclick="alert(Blockly.Python.workspaceToCode(workspace))">Print</button>-->
+<button id="exec">Play</button><button id="stop">Stop</button>
+<div id="blocklyDiv" style="height: 560px; width: 1000px;"></div>
+<xml id="toolbox" style="display: none">
+<category name="Menu" colour="210">
+  <block type="logic_operation"></block>
+  <block type="variables_set"></block>
+  <block type="variables_get"></block>
+  <block type="math_number"></block>
+  <block type="math_random_int"></block>  
+  <block type="math_arithmetic"></block>
+  <block type="math_change"></block>
+  <block type="controls_if"></block>
+  <block type="logic_compare"></block>
+  <block type="moncustom"></block>
+  <block type="attendre"></block>
+  <block type="pitchtofrequ">
+   <value name="NAME">
+      <shadow type="math_number">
+         <field name="NUM">55</field>
+      </shadow>
+   </value>
+  </block>
+  <block type="hz">
+  <value name="synthID">
+   <shadow type="math_number">
+      <field name="NUM">1</field>
+   </shadow>
+   </value>
+   <value name="Frequ">
+   <shadow type="math_number">
+      <field name="NUM">440</field>
+   </shadow>
+   </value>
+   <value name="durée">
+   <shadow type="math_number">
+      <field name="NUM">500</field>
+   </shadow>
+   </value>
+  </block>
+  <block type="math_trig"></block>
+</category>
+</xml>
+</body>
+<script>
+
+
+$(function(){
+var workspace = Blockly.inject('blocklyDiv',
+{
+	toolbox: document.getElementById('toolbox'),
+	scrollbars: true,
+	sounds:false
+});
+
+workspace.addChangeListener(workspaceChanged);
+var launch=0;
+var nbevent=0;
+var last=0;
+var nbeventlist = new Array();
+function workspaceChanged(workspaceEvent){
+	if(workspaceEvent.type=="create" || workspaceEvent.type=="delete" || workspaceEvent.type=="change")
+	{
+		nbevent+=1;
+		nbeventlist.push(nbevent);
+		setTimeout(checkandlaunch,1000);
+	}
+	if(workspaceEvent.type=="move")
+	{
+		if(workspaceEvent.oldParentId != workspaceEvent.newParentId)
+		{
+			nbevent+=1;
+			nbeventlist.push(nbevent);
+			setTimeout(checkandlaunch,1000);
+		}
+	}
+}
+
+function checkandlaunch(){	
+	//console.log("nbvent :"+nbevent);
+	//console.log("last :"+last);
+	if(last!=nbevent)
+	{
+		load();
+		nbevent=0;
+		last=0;
+	}
+	last=nbevent;
+	//console.log("nbventList :"+nbeventlist);
+}
+
+	var pid;
+	function load(){
+		$.ajax({
+    		data: 'orderid=' + encodeURIComponent(Blockly.Python.workspaceToCode(workspace)) + '&pid=' + pid,
+    		url: 'exec_python.php',
+    		method: 'POST', // or GET
+    		success: function(msg) {
+			pid=msg;
+    		}
+		});
+	}
+
+    $("#stop").click(function(){
+		//alert(pid);
+		$.ajax({
+    		data: 'pid='+pid,
+    		url: 'exec_python.php',
+    		method: 'POST', // or GET
+    		success: function(msg) {
+    		}
+		});
+	});
+});
+</script>
+</html>
