@@ -6,4 +6,4 @@ intégrer gestion MCP3008 <br>
 intégrer variables de capteurs <br>
 intégrer bloque init et ? bloque boucle ? <br>
 prog évenementielle ? <br>
-interpretation dynamique du code python via communication temp réel entre python et blockly (rest api) <br>
+interpretation dynamique du code python via communication temp réel entre python et blockly (rest api) pour gagner en réactivité (liveconding) <br>
